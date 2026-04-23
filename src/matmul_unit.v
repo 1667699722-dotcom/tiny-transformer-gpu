@@ -65,14 +65,7 @@ always @(*) begin
     end
     COMPUTE:
     begin
-        if(done)
-        begin
-            nextstate=DONE;
-        end
-        else
-        begin
-            nextstate=COMPUTE;
-        end
+        nextstate=DONE;
     end
     DONE:
     begin
@@ -109,6 +102,7 @@ always @(posedge clk or negedge rst) begin
         COMPUTE:
         begin
             done<=1;
+            mat_c<=mat_d;
         end
         DONE:
         begin
