@@ -1,24 +1,22 @@
 module matmul_unit #(
-    parameter DATA_WIDTH =16,
-    parameter SIZE = 8,
-    parameter OUT_WIDTH = 35
+    parameter DATA_WIDTH =1,
+    parameter SIZE = 2,
+    parameter OUT_WIDTH = 3
 )(
     input wire clk,
     input wire rst,
     input wire start,
     input wire [DATA_WIDTH*SIZE*SIZE-1:0] mat_a,
     input wire [DATA_WIDTH*SIZE*SIZE-1:0] mat_b,
-    output reg [OUT_WIDTH*SIZE*SIZE-1:0] mat_c,
+    output reg  [OUT_WIDTH*SIZE*SIZE-1:0] mat_c,
     output reg done
 );
 
-localparam IDLE = 2'b00;
-localparam COMPUTE = 2'b01;
-localparam DONE = 2'b11;
+localparam IDLE = 1'b0;
+localparam COMPUTE = 1'b1;
 
-reg [2:0] state,nextstate;
+reg [0:0] state,nextstate;
 wire [OUT_WIDTH*SIZE*SIZE-1:0] mat_d;
-
 generate
     genvar i, j, k, s;
     for(i = 0; i < SIZE; i = i + 1) begin : row
@@ -65,17 +63,13 @@ always @(*) begin
     end
     COMPUTE:
     begin
-        nextstate=DONE;
-    end
-    DONE:
-    begin
-        if(start)
+        if(done)
         begin
-            nextstate=DONE;
+            nextstate=IDLE;
         end
         else
         begin
-            nextstate=IDLE;
+            nextstate=COMPUTE;
         end
     end
     default:
@@ -101,12 +95,8 @@ always @(posedge clk or negedge rst) begin
         end
         COMPUTE:
         begin
+            mat_c<=mat_d;
             done<=1;
-            mat_c<=mat_d;
-        end
-        DONE:
-        begin
-            mat_c<=mat_d;
         end
         endcase
     end
