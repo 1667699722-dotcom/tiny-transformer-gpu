@@ -14,7 +14,6 @@ module matmul_unit #(
 
 localparam IDLE = 1'b0;
 localparam COMPUTE = 1'b1;
-
 reg [0:0] state,nextstate;
 wire [OUT_WIDTH*SIZE*SIZE-1:0] mat_d;
 generate
@@ -63,14 +62,7 @@ always @(*) begin
     end
     COMPUTE:
     begin
-        if(done)
-        begin
-            nextstate=IDLE;
-        end
-        else
-        begin
-            nextstate=COMPUTE;
-        end
+        nextstate=IDLE;
     end
     default:
     begin
@@ -87,11 +79,10 @@ always @(posedge clk or negedge rst) begin
     end
     else
     begin
-        done<=0;
         case(state)
         IDLE:
         begin
-            mat_c<=0;
+            done<=0;
         end
         COMPUTE:
         begin
@@ -99,6 +90,7 @@ always @(posedge clk or negedge rst) begin
             done<=1;
         end
         endcase
+
     end
 end
 endmodule
